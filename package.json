@@ -1,5 +1,5 @@
 {
-  "name": "tangential-core",
+  "name": "@akfreas/tangential-core",
   "version": "1.0.0",
   "description": "Shared code for Tangential functionaliy",
   "main": "index.js",
