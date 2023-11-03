@@ -2,9 +2,11 @@
   "name": "@akfreas/tangential-core",
   "version": "1.0.0",
   "description": "Shared code for Tangential functionaliy",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "exit 0"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,12 @@
   },
   "homepage": "https://github.com/akfreas/tangential-core#readme",
   "publishConfig": {
-      "@akfreas:registry": "https://npm.pkg.github.com"
+    "@akfreas:registry": "https://npm.pkg.github.com"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "mongodb": "^6.2.0"
   }
 }
