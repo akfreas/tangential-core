@@ -95,17 +95,7 @@ export type IssueComment = {
   self: string;
   id: string;
   author: JiraProfile;
-  body: {
-    type: string;
-    version: number;
-    content: Array<{
-      type: string;
-      content: Array<{
-        type: string;
-        text: string;
-      }>;
-    }>;
-  };
+  renderedBody: string;
   updateAuthor: JiraProfile;
   created: string;
   updated: string;
