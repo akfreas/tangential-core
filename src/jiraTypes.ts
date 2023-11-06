@@ -99,11 +99,6 @@ export type IssueComment = {
   updateAuthor: JiraProfile;
   created: string;
   updated: string;
-  visibility: {
-    type: string;
-    value: string;
-    identifier: string;
-  };
 };
 
 
