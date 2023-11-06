@@ -1,7 +1,7 @@
 {
   "name": "@akfreas/tangential-core",
   "version": "1.0.2",
-  "description": "Shared code for Tangential functionaliy",
+  "description": "Shared code for Tangential functionality",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -24,7 +24,7 @@
   "devDependencies": {
     "typescript": "^5.2.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "mongodb": "^6.2.0"
   }
 }

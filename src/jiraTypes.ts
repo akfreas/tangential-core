@@ -32,10 +32,6 @@ export interface AvatarUrls {
   "32x32": string;
 }
 
-export interface Author {
-  accountId: string;
-  displayName: string;
-}
 
 export interface ChangelogItem {
   field: string;
@@ -49,7 +45,7 @@ export interface ChangelogItem {
 
 export interface ChangelogValue {
   id: string;
-  author: Author;
+  author: JiraProfile;
   created: string;
   items: ChangelogItem[];
 }
