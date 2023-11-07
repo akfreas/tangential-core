@@ -1,0 +1,13 @@
+{
+  "editor.codeActionsOnSave": {
+
+  },
+
+  "runOnSave.commands": [
+    {
+      "match": "\\.js$|\\.jsx$|\\.ts$|\\.tsx$", // this regex targets JavaScript and TypeScript files
+      "command": "npm run build",
+      "runIn": "terminal",
+    }
+  ]
+}

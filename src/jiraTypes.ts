@@ -74,16 +74,12 @@ export interface LongRunningIssue {
   timeInStatus: number;
 }
 
-export interface EpicReport {
-  epicKey: string;
-  velocity: number;
-  changelogs: ChangelogEntry[];
-  status: string;
-  longRunningIssues: LongRunningIssue[];
-  childIssues: ChildIssue[];
-  summary: string;
-  generatedSummary: string;
+export interface Velocity {
+  daily: number;
+  total: number;
+  window: number;
 }
+
 
 export interface JiraProfile {
   accountId: string;
@@ -101,15 +97,42 @@ export type IssueComment = {
   updated: string;
 };
 
+export interface AnalysisState {
+  id: string;
+  name: string;
+  color: string;
+}
 
-export interface ProjectReport extends Document {
-  velocity: number;
+export interface Analysis {
+  predictedEndDate: string;
+  predictedOverdue?: boolean;
+  state?: AnalysisState;
+  summaryText?: string;
+}
+
+export interface Report {
+  reportGenerationDate: string;
+  velocity: Velocity;
+  analysis?: Analysis;
+  remainingPoints: number;
+  status: string;
+}
+
+export interface ProjectReport extends Document, Report {
+
   name: string;
   lead: JiraProfile;
-  active: boolean;
   epics: EpicReport[];
   windowStartDate: string;
   windowEndDate: string;
   projectKey: string;
 }
 
+
+export interface EpicReport extends Report {
+  epicKey: string;
+  changelogs: ChangelogEntry[];
+  longRunningIssues: LongRunningIssue[];
+  childIssues: ChildIssue[];
+  summary: string;
+}
