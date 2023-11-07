@@ -97,14 +97,14 @@ export type IssueComment = {
   updated: string;
 };
 
-export interface AnalysisState {
+export type AnalysisState = {
   id: string;
   name: string;
   color: string;
-}
+};
 
 export interface Analysis {
-  predictedEndDate: string;
+  predictedEndDate?: string;
   predictedOverdue?: boolean;
   state?: AnalysisState;
   summaryText?: string;
