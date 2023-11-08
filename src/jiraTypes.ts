@@ -140,4 +140,5 @@ export interface EpicReport extends Report {
   longRunningIssues: JiraIssue[];
   childIssues: JiraIssue[];
   summary: string;
+  dueDate?: string;
 }
