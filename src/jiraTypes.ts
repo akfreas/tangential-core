@@ -115,6 +115,7 @@ export interface Report {
   velocity: Velocity;
   analysis?: Analysis;
   remainingPoints: number;
+  totalPoints: number;
   status: string;
 }
 
@@ -128,9 +129,9 @@ export interface ProjectReport extends Document, Report {
   projectKey: string;
 }
 
-
 export interface EpicReport extends Report {
   epicKey: string;
+  assignee: JiraProfile;
   changelogs: ChangelogEntry[];
   longRunningIssues: LongRunningIssue[];
   childIssues: ChildIssue[];
