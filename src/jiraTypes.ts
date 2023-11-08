@@ -61,17 +61,12 @@ export interface Changelog {
 }
 
 
-export interface ChildIssue {  // probably rename to "ticket" or "story"
-  id: string;
-  key: string;
-  fields?: any;
-}
 
-export interface LongRunningIssue {
+export interface JiraIssue {
   id: string;
   key: string;
   self: string;
-  timeInStatus: number;
+  timeInStatus?: number;
 }
 
 export interface Velocity {
@@ -110,13 +105,22 @@ export interface Analysis {
   summaryText?: string;
 }
 
+export interface IssuePriority {
+  iconUrl: string;
+  name: string;
+  id: string;
+}
+
 export interface Report {
   reportGenerationDate: string;
   velocity: Velocity;
   analysis?: Analysis;
   remainingPoints: number;
+  inProgressPoints: number;
+  completedPoints: number;
   totalPoints: number;
-  status: string;
+  statusName: string;
+  priority: IssuePriority;
 }
 
 export interface ProjectReport extends Document, Report {
@@ -132,8 +136,8 @@ export interface ProjectReport extends Document, Report {
 export interface EpicReport extends Report {
   epicKey: string;
   assignee: JiraProfile;
-  changelogs: ChangelogEntry[];
-  longRunningIssues: LongRunningIssue[];
-  childIssues: ChildIssue[];
+  changelogs: ChangelogValue[];
+  longRunningIssues: JiraIssue[];
+  childIssues: JiraIssue[];
   summary: string;
 }
