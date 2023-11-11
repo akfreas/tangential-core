@@ -121,6 +121,7 @@ export interface Report {
   totalPoints: number;
   statusName?: string;
   priority?: IssuePriority;
+  summaryText?: string;
 }
 
 export interface ProjectReport extends Document, Report {
