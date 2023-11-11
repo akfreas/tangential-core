@@ -112,6 +112,7 @@ export interface IssuePriority {
 }
 
 export interface Report {
+  ownerId: string;
   reportGenerationDate: string;
   velocity: Velocity;
   analysis?: Analysis;
@@ -125,7 +126,6 @@ export interface Report {
 }
 
 export interface ProjectReport extends Document, Report {
-
   name: string;
   lead: JiraProfile;
   epics: EpicReport[];
