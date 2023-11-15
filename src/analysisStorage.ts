@@ -1,8 +1,7 @@
-
-import { promises as fs } from 'fs';
 import { EpicReport, ProjectReport } from './types/jiraTypes';
 import { doLog } from './logging';
 import { MongoDBWrapper } from './databaseWrapper';
+
 export async function storeProjectReport(report: ProjectReport): Promise<void> {
   try {
     // Validation for essential keys
@@ -10,16 +9,7 @@ export async function storeProjectReport(report: ProjectReport): Promise<void> {
       doLog('Error: projectKey is missing in the provided report');
       return;
     }
-    const fileName = `./reports/${report.projectKey}.json`;
-    try {
-      await fs.mkdir('./reports', { recursive: false });
-    } catch (error) {
-      doLog("Failed to create reports directory: ", error)
-    }
-    await fs.writeFile(fileName, JSON.stringify(report, null, 2));
 
-    console.log(`Successfully wrote report to file: ${fileName}`);
-    
 
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE)
     
@@ -71,7 +61,8 @@ export async function fetchAllProjectReports(ownerId: string): Promise<ProjectRe
     const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
     // Fetching all reports from the database
     const reportsArray = await reportsCollection.find({
-      ownerId
+      ownerId,
+      reportType: 'project'
     }).toArray();
     if (!reportsArray || reportsArray.length === 0) {
       doLog('No reports found.');
