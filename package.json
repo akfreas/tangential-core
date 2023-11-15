@@ -26,5 +26,10 @@
   },
   "peerDependencies": {
     "mongodb": "^6.2.0"
+  },
+  "dependencies": {
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jose": "^5.1.0"
   }
 }

@@ -1,9 +1,9 @@
 
 import { promises as fs } from 'fs';
-import { EpicReport, ProjectReport } from './jiraTypes';
+import { EpicReport, ProjectReport } from './types/jiraTypes';
 import { doLog } from './logging';
 import { MongoDBWrapper } from './databaseWrapper';
-export async function storeProjectReport(ownerId: string, report: ProjectReport): Promise<void> {
+export async function storeProjectReport(report: ProjectReport): Promise<void> {
   try {
     // Validation for essential keys
     if (!report.projectKey) {
@@ -26,7 +26,10 @@ export async function storeProjectReport(ownerId: string, report: ProjectReport)
     const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
     // Storing the report in the database
     await reportsCollection.updateOne(
-      { projectKey: report.projectKey, ownerId }, // filter
+      { projectKey: report.projectKey, 
+        ownerId: report.ownerId,
+        atlassianWorkspaceId: report.atlassianWorkspaceId
+       }, // filter
       { $set: report }, // update
       { upsert: true } // options: create a new document if no documents match the filter
     );
@@ -37,7 +40,7 @@ export async function storeProjectReport(ownerId: string, report: ProjectReport)
   }
 }
 
-export async function storeEpicReport(ownerId: string, report: EpicReport): Promise<void> {
+export async function storeEpicReport(report: EpicReport): Promise<void> {
 
   try {
     // Validation for essential keys
@@ -51,7 +54,7 @@ export async function storeEpicReport(ownerId: string, report: EpicReport): Prom
     const reportsCollection = dbWrapper.getCollection<EpicReport>('reports');
     // Storing the report in the database
     await reportsCollection.updateOne(
-      { epicKey: report.epicKey, ownerId }, // filter
+      { epicKey: report.epicKey, ownerId: report.ownerId }, // filter
       { $set: report }, // update
       { upsert: true } // options: create a new document if no documents match the filter
     );
@@ -83,6 +86,28 @@ export async function fetchAllProjectReports(ownerId: string): Promise<ProjectRe
     return reportsArray;
   } catch (error) {
     doLog(`Failed to fetch reports: ${error}`);
+    return null;
+  }
+}
+
+export async function fetchReportByProjectKey(ownerId: string, atlassianWorkspaceId: string, projectKey: string): Promise<ProjectReport | null> {
+  try {
+    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    // Fetching all reports from the database
+    const report: ProjectReport | null = await reportsCollection.findOne({
+      ownerId,
+      projectKey,
+      atlassianWorkspaceId
+    });
+    if (!report) {
+      doLog('No report found.');
+      return null;
+    }
+
+    return report;
+  } catch (error) {
+    doLog(`Failed to fetch report: ${error}`);
     return null;
   }
 }

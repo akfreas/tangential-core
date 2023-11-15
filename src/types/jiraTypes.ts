@@ -6,9 +6,15 @@ export interface ChangelogEntry {
   changelog: any[];
 }
 
+
+
 export interface JiraRequestAuth {
   accessToken: string;
-  atlassianId: string;
+  atlassianWorkspaceId: string;
+  refreshToken: string;
+}
+export interface JiraAuthDetails extends JiraRequestAuth {
+  atlassianUserId: string;
 }
 
 export interface JiraRequestOptions {
@@ -110,9 +116,20 @@ export interface IssuePriority {
   name: string;
   id: string;
 }
+export interface ReportBuildStatus {
+  status: 'pending' | 'success' | 'failure';
+  remainingItems: string[];
+  startedAt: string;
+  completedAt?: string;
+}
 
 export interface Report {
+  reportType: 'project' | 'epic';
+  jobId: string;
+  avatar?: string;
+  buildStatus: ReportBuildStatus;
   ownerId: string;
+  atlassianWorkspaceId: string;
   reportGenerationDate: string;
   velocity: Velocity;
   analysis?: Analysis;
@@ -128,7 +145,7 @@ export interface Report {
 export interface ProjectReport extends Document, Report {
   name: string;
   lead: JiraProfile;
-  epics: EpicReport[];
+  epics?: EpicReport[];
   windowStartDate: string;
   windowEndDate: string;
   projectKey: string;
