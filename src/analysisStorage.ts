@@ -1,5 +1,5 @@
 import { EpicReport, ProjectReport } from './types/jiraTypes';
-import { doLog } from './logging';
+import { doLog, jsonLog } from './logging';
 import { MongoDBWrapper } from './databaseWrapper';
 
 export async function storeProjectReport(report: ProjectReport): Promise<void> {
@@ -69,11 +69,6 @@ export async function fetchAllProjectReports(ownerId: string): Promise<ProjectRe
       return [];
     }
 
-    // let mappedReports: any = {};
-    // reportsArray.forEach((report: ProjectReport) => {
-    //   mappedReports[report.projectKey] = report;
-    // })
-
     return reportsArray;
   } catch (error) {
     doLog(`Failed to fetch reports: ${error}`);
@@ -99,6 +94,108 @@ export async function fetchReportByProjectKey(ownerId: string, atlassianWorkspac
     return report;
   } catch (error) {
     doLog(`Failed to fetch report: ${error}`);
+    return null;
+  }
+}
+
+export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promise<ProjectReport[] | null> {
+  try {
+    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+
+    const pipeline = [
+      {
+        $match: {
+          ownerId,
+          reportType: 'project'
+        }
+      },
+      {
+        $sort: {
+          reportGenerationDate: -1
+        }
+      },
+      {
+        $group: {
+          _id: "$jobId",
+          latestReport: { $first: "$$ROOT" }
+        }
+      },
+      {
+        $lookup: {
+          from: "reports",
+          let: { jobId: "$latestReport.jobId" },
+          pipeline: [
+            { $match: { $expr: { $and: [
+              { $eq: ["$jobId", "$$jobId"] },
+              { $eq: ["$reportType", "epic"] }
+            ]}}},
+          ],
+          as: "epics"
+        }
+      },
+      {
+        $replaceRoot: { newRoot: { $mergeObjects: ["$latestReport", { epics: "$epics" }] } }
+      }
+    ];
+    
+
+    // Execute the aggregation pipeline
+    const latestReportsWithEpics = await reportsCollection.aggregate<ProjectReport>(pipeline).toArray();
+    jsonLog("latestReportsWithEpics", latestReportsWithEpics)
+    if (!latestReportsWithEpics || latestReportsWithEpics.length === 0) {
+      doLog('No latest project reports with epics found.');
+      return [];
+    }
+    
+    return latestReportsWithEpics;
+  } catch (error) {
+    doLog(`Failed to fetch latest project reports with epics: ${error}`);
+    return null;
+  }
+}
+
+
+export async function fetchLatestProjectReports(ownerId: string): Promise<ProjectReport[] | null> {
+  try {
+    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+
+    // Define the aggregation pipeline
+    const pipeline = [
+      {
+        $match: {
+          ownerId,
+          reportType: 'project'
+        }
+      },
+      {
+        $sort: {
+          reportGenerationDate: -1 // Sorting by date in descending order
+        }
+      },
+      {
+        $group: {
+          _id: "$jobId", // Grouping by jobId, replace with your unique report key field
+          latestReport: { $first: "$$ROOT" } // Taking the first document of each group
+        }
+      },
+      {
+        $replaceRoot: { newRoot: "$latestReport" } // Replace the root to return only the report documents
+      }
+    ];
+
+    // Execute the aggregation pipeline
+    const latestReportsArray = await reportsCollection.aggregate<ProjectReport>(pipeline).toArray();
+
+    if (!latestReportsArray || latestReportsArray.length === 0) {
+      doLog('No latest reports found.');
+      return [];
+    }
+    
+    return latestReportsArray;
+  } catch (error) {
+    doLog(`Failed to fetch latest reports: ${error}`);
     return null;
   }
 }

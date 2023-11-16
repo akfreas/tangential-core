@@ -121,6 +121,7 @@ export interface ReportBuildStatus {
   remainingItems: string[];
   startedAt: string;
   completedAt?: string;
+  jobId: string;
 }
 
 export interface Report {
