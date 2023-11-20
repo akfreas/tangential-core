@@ -147,6 +147,33 @@ export async function fetchReportByBuildId(ownerId: string, buildId: string): Pr
   }
 }
 
+export async function updateReport(report: ProjectReport): Promise<void> {
+
+  try {
+    // Validation for essential keys
+    if (!report.projectKey) {
+      doLog('Error: projectKey is missing in the provided report');
+      return;
+    }
+
+    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE)
+    
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    // Storing the report in the database
+    await reportsCollection.updateOne(
+      { projectKey: report.projectKey, 
+        ownerId: report.ownerId,
+        atlassianWorkspaceId: report.atlassianWorkspaceId
+       }, // filter
+      { $set: report }, // update
+      { upsert: true } // options: create a new document if no documents match the filter
+    );
+
+    console.log(`Successfully updated the report for project: ${report.projectKey}`);
+  } catch (error) {
+    doLog(`Failed to update the report: ${error}`);
+  }
+}
 
 export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promise<ProjectReport[] | null> {
   try {
