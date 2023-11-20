@@ -121,12 +121,12 @@ export interface ReportBuildStatus {
   remainingItems: string[];
   startedAt: string;
   completedAt?: string;
-  jobId: string;
+  buildId: string;
 }
 
 export interface Report {
   reportType: 'project' | 'epic';
-  jobId: string;
+  buildId: string;
   avatar?: string;
   buildStatus: ReportBuildStatus;
   ownerId: string;

@@ -98,6 +98,56 @@ export async function fetchReportByProjectKey(ownerId: string, atlassianWorkspac
   }
 }
 
+export async function fetchReportByBuildId(ownerId: string, buildId: string): Promise<ProjectReport | null> {
+  try {
+    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+
+    const pipeline = [
+      {
+        $match: {
+          ownerId,
+          buildId
+        }
+      },
+      {
+        $lookup: {
+          from: "reports",
+          let: { reportBuildId: "$buildId" },
+          pipeline: [
+            { 
+              $match: { 
+                $expr: { 
+                  $and: [
+                    { $eq: ["$buildId", "$$reportBuildId"] },
+                    { $eq: ["$reportType", "epic"] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "epics"
+        }
+      },
+      { $limit: 1 } // Since we are expecting only one report
+    ];
+
+    // Execute the aggregation pipeline
+    const reportWithEpics = await reportsCollection.aggregate<ProjectReport>(pipeline).toArray();
+    
+    if (!reportWithEpics || reportWithEpics.length === 0) {
+      doLog('No report with the specified buildId found.');
+      return null;
+    }
+
+    return reportWithEpics[0];
+  } catch (error) {
+    doLog(`Failed to fetch report: ${error}`);
+    return null;
+  }
+}
+
+
 export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promise<ProjectReport[] | null> {
   try {
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
@@ -117,17 +167,17 @@ export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promi
       },
       {
         $group: {
-          _id: "$jobId",
+          _id: "$buildId",
           latestReport: { $first: "$$ROOT" }
         }
       },
       {
         $lookup: {
           from: "reports",
-          let: { jobId: "$latestReport.jobId" },
+          let: { buildId: "$latestReport.buildId" },
           pipeline: [
             { $match: { $expr: { $and: [
-              { $eq: ["$jobId", "$$jobId"] },
+              { $eq: ["$buildId", "$$buildId"] },
               { $eq: ["$reportType", "epic"] }
             ]}}},
           ],
@@ -176,7 +226,7 @@ export async function fetchLatestProjectReports(ownerId: string): Promise<Projec
       },
       {
         $group: {
-          _id: "$jobId", // Grouping by jobId, replace with your unique report key field
+          _id: "$buildId", // Grouping by buildId, replace with your unique report key field
           latestReport: { $first: "$$ROOT" } // Taking the first document of each group
         }
       },
