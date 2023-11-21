@@ -6,8 +6,6 @@ export interface ChangelogEntry {
   changelog: any[];
 }
 
-
-
 export interface JiraRequestAuth {
   accessToken: string;
   atlassianWorkspaceId: string;
@@ -37,12 +35,20 @@ export interface AvatarUrls {
   "16x16": string;
   "32x32": string;
 }
-
+export interface ProjectInfo {
+  id: string;
+  key: string;
+  name: string;
+  displayName?: string;
+  avatarUrls: any;
+  active: boolean;
+  lead: JiraProfile;
+}
 
 export interface ChangelogItem {
   field: string;
   fieldtype: string;
-  fieldId: string; // New field
+  fieldId: string; 
   from: string | null;
   fromString: string;
   to: string | null;
@@ -57,34 +63,17 @@ export interface ChangelogValue {
 }
 
 export interface Changelog {
-  self: string; // New field
-  nextPage: string; // New field
-  maxResults: number; // New field
-  startAt: number; // New field
-  total: number; // New field
-  isLast: boolean; // New field
-  values: ChangelogValue[]; // Updated field type
+  self: string; 
+  nextPage: string; 
+  maxResults: number; 
+  startAt: number; 
+  total: number; 
+  isLast: boolean; 
+  values: ChangelogValue[];
 }
-
-
-
-export interface JiraIssue {
-  id: string;
-  key: string;
-  self: string;
-  timeInStatus?: number;
-}
-
-export interface Velocity {
-  daily: number;
-  total: number;
-  window: number;
-}
-
 
 export interface JiraProfile {
   accountId: string;
-  avatarUrls: AvatarUrls;
   displayName: string;
 }
 
@@ -98,66 +87,8 @@ export type IssueComment = {
   updated: string;
 };
 
-export type AnalysisState = {
-  id: string;
-  name: string;
-  color: string;
-};
-
-export interface Analysis {
-  predictedEndDate?: string;
-  predictedOverdue?: boolean;
-  state?: AnalysisState;
-  summaryText?: string;
-}
-
 export interface IssuePriority {
   iconUrl: string;
   name: string;
   id: string;
-}
-export interface ReportBuildStatus {
-  status: 'pending' | 'success' | 'failure';
-  remainingItems: string[];
-  startedAt: string;
-  completedAt?: string;
-  buildId: string;
-}
-
-export interface Report {
-  reportType: 'project' | 'epic';
-  buildId: string;
-  avatar?: string;
-  buildStatus: ReportBuildStatus;
-  ownerId: string;
-  atlassianWorkspaceId: string;
-  reportGenerationDate: string;
-  velocity: Velocity;
-  analysis?: Analysis;
-  remainingPoints: number;
-  inProgressPoints: number;
-  completedPoints: number;
-  totalPoints: number;
-  statusName?: string;
-  priority?: IssuePriority;
-  summaryText?: string;
-}
-
-export interface ProjectReport extends Document, Report {
-  name: string;
-  lead: JiraProfile;
-  epics?: EpicReport[];
-  windowStartDate: string;
-  windowEndDate: string;
-  projectKey: string;
-}
-
-export interface EpicReport extends Report {
-  epicKey: string;
-  assignee: JiraProfile;
-  changelogs: ChangelogValue[];
-  longRunningIssues: JiraIssue[];
-  childIssues: JiraIssue[];
-  summary: string;
-  dueDate?: string;
 }

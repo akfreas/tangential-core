@@ -1,6 +1,6 @@
-import { EpicReport, ProjectReport } from './types/jiraTypes';
 import { doLog, jsonLog } from './logging';
 import { MongoDBWrapper } from './databaseWrapper';
+import { EpicReport, ProjectReport } from './types/reportingTypes';
 
 export async function storeProjectReport(report: ProjectReport): Promise<void> {
   try {
@@ -24,7 +24,7 @@ export async function storeProjectReport(report: ProjectReport): Promise<void> {
       { upsert: true } // options: create a new document if no documents match the filter
     );
 
-    console.log(`Successfully stored the report for project: ${report.projectKey}`);
+    doLog(`Successfully stored the report for project: ${report.projectKey}`);
   } catch (error) {
     doLog(`Failed to store the report: ${error}`);
   }
@@ -34,8 +34,8 @@ export async function storeEpicReport(report: EpicReport): Promise<void> {
 
   try {
     // Validation for essential keys
-    if (!report.epicKey) {
-      doLog('Error: epicKey is missing in the provided report');
+    if (!report.key) {
+      doLog('Error: key is missing in the provided report');
       return;
     }
 
@@ -44,12 +44,12 @@ export async function storeEpicReport(report: EpicReport): Promise<void> {
     const reportsCollection = dbWrapper.getCollection<EpicReport>('reports');
     // Storing the report in the database
     await reportsCollection.updateOne(
-      { epicKey: report.epicKey, ownerId: report.ownerId }, // filter
+      { key: report.key, ownerId: report.ownerId }, // filter
       { $set: report }, // update
       { upsert: true } // options: create a new document if no documents match the filter
     );
 
-    console.log(`Successfully stored the report for epic: ${report.epicKey}`);
+    doLog(`Successfully stored the report for epic: ${report.key}`);
   } catch (error) {
     doLog(`Failed to store the report: ${error}`);
   }
@@ -169,7 +169,7 @@ export async function updateReport(report: ProjectReport): Promise<void> {
       { upsert: true } // options: create a new document if no documents match the filter
     );
 
-    console.log(`Successfully updated the report for project: ${report.projectKey}`);
+    doLog(`Successfully updated the report for project: ${report.projectKey}`);
   } catch (error) {
     doLog(`Failed to update the report: ${error}`);
   }

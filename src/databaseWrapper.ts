@@ -18,6 +18,8 @@ export class MongoDBWrapper {
     this.databaseName = database;
   }
 
+  
+
   public static async getInstance(url?: string, database?: string): Promise<MongoDBWrapper> {
 
     if (!url || !database) {
@@ -63,6 +65,7 @@ export class MongoDBWrapper {
     if (!this.db) {
       throw new Error('Database connection not established');
     }
+
     return this.db.collection<T>(name);
   }
 

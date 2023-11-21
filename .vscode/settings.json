@@ -1,5 +1,6 @@
 {
-
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
   "runOnSave.commands": [
     {
       "match": "\\.js$|\\.jsx$|\\.ts$|\\.tsx$", // this regex targets JavaScript and TypeScript files

@@ -57,7 +57,7 @@ export async function upsertTemplate(atlassianWorkspaceId: string, template: Rep
       { upsert: true } // options: create a new document if no documents match the filter
     );
 
-    console.log(`Successfully stored the template: ${template.id}`);
+    doLog(`Successfully stored the template: ${template.id}`);
   } catch (error) {
     doLog(`Failed to store the template: ${error}`);
   }
@@ -72,7 +72,7 @@ export async function deleteTemplate(atlassianWorkspaceId: string, templateId: s
       { atlassianWorkspaceId, templateId }, // filter
     );
 
-    console.log(`Successfully deleted the template: ${templateId}`);
+    doLog(`Successfully deleted the template: ${templateId}`);
   } catch (error) {
     doLog(`Failed to delete the template: ${error}`);
   }
