@@ -42,12 +42,12 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: danger
-          SLACK_MESSAGE: 'Node.js Package: Publishing to GPR failed :fire:'
+          SLACK_MESSAGE: 'Node.js Package: Publishing to GPR failed :fire: | ${{ github.event.head_commit.message }}'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
       - name: Slack Success Notification
         if: ${{ success() }}
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: good
-          SLACK_MESSAGE: 'Node.js Package: Publishing to GPR successful :tada:'
+          SLACK_MESSAGE: 'Node.js Package: Publishing to GPR successful :tada: | ${{ github.event.head_commit.message }}'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

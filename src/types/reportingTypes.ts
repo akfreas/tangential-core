@@ -33,7 +33,13 @@ export interface ReportBuildStatus {
   buildId: string;
 }
 
-
+export interface SummaryText {
+  shortSummary: string;
+  longSummary: string;
+  potentialRisks: string;
+  actionNeeded: boolean;
+  color: string;
+}
 
 export interface Report {
   reportType: 'project' | 'epic';
@@ -51,7 +57,8 @@ export interface Report {
   totalPoints: number;
   statusName?: string;
   priority?: IssuePriority;
-  summaryText?: string;
+  title: string;
+  summary?: SummaryText;
 }
 export interface IssueReport {
   id: string;
@@ -63,7 +70,6 @@ export interface IssueReport {
 }
 
 export interface ProjectReport extends Report {
-  name: string;
   lead: JiraProfile;
   epics?: EpicReport[];
   windowStartDate: string;
@@ -76,7 +82,6 @@ export interface EpicReport extends Report, IssueReport {
   longRunningIssues: LongRunningIssue[];
   childIssues: IssueReport[];
   scopeDeltas: ScopeDelta[];
-  summary: string;
 }
 
 export interface ChangelogTimeline {
