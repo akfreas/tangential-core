@@ -1,79 +1,54 @@
-import { MongoDBWrapper } from "./databaseWrapper";
-import { doError, doLog } from "./logging";
-import { ReportTemplate } from "./types/template";
+import { MongoDBWrapper } from './databaseWrapper';
+import { ReportTemplate } from './types/template';
 
-const templateCollectionName = 'templates';
 
-export async function fetchTemplate(atlassianWorkspaceId: string, templateId: string): Promise<ReportTemplate | undefined | null> {
-  try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const templatesCollection = dbWrapper.getCollection<any>(templateCollectionName);
-    // Fetching all reports from the database
-    const template: ReportTemplate = await templatesCollection.findOne({
-      atlassianWorkspaceId,
-      templateId
-    });
-    if (!template) {
-      doLog('No template found.');
-      return null;
-    }
+const collectionName = 'report_templates';
 
-    return template;
-  } catch (error) {
-    doLog(`Failed to fetch template: ${error}`);
-  }
+// Create a ReportTemplate
+export async function createReportTemplate(template: ReportTemplate): Promise<void> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  await templatesCollection.insertOne(template);
 }
 
-export async function fetchAllTemplates(atlassianWorkspaceId: string): Promise<ReportTemplate[]> {
-  try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const templatesCollection = dbWrapper.getCollection<any>(templateCollectionName);
-    // Fetching all reports from the database
-    const templates = await templatesCollection.find({
-      atlassianWorkspaceId
-    }).toArray();
-    if (!templates || templates.length === 0) {
-      doLog('No templates found.');
-      return [];
-    }
-
-    return templates;
-  } catch (error) {
-    if (error instanceof Error) {
-      doError(`Failed to fetch templates`, error);
-    }
-    return [];
-  }
+// Read (Fetch) a ReportTemplate by ID
+export async function fetchReportTemplateById(id: string): Promise<ReportTemplate | null> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  return await templatesCollection.findOne({ id });
 }
 
-export async function upsertTemplate(atlassianWorkspaceId: string, template: ReportTemplate): Promise<void> {
-  try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const templatesCollection = dbWrapper.getCollection<ReportTemplate>(templateCollectionName);
-    // Storing the report in the database
-    await templatesCollection.updateOne(
-      { atlassianWorkspaceId, templateId: template.id }, // filter
-      { $set: template }, // update
-      { upsert: true } // options: create a new document if no documents match the filter
-    );
-
-    doLog(`Successfully stored the template: ${template.id}`);
-  } catch (error) {
-    doLog(`Failed to store the template: ${error}`);
-  }
+// Update a ReportTemplate
+export async function updateReportTemplate(template: ReportTemplate): Promise<void> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  await templatesCollection.updateOne({ id: template.id }, { $set: template });
 }
 
-export async function deleteTemplate(atlassianWorkspaceId: string, templateId: string): Promise<void> {
-  try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const templatesCollection = dbWrapper.getCollection<ReportTemplate>(templateCollectionName);
-    // Storing the report in the database
-    await templatesCollection.deleteOne(
-      { atlassianWorkspaceId, templateId }, // filter
-    );
+// Delete a ReportTemplate by ID
+export async function deleteReportTemplateById(id: string): Promise<void> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  await templatesCollection.deleteOne({ id });
+}
 
-    doLog(`Successfully deleted the template: ${templateId}`);
-  } catch (error) {
-    doLog(`Failed to delete the template: ${error}`);
-  }
+// Fetch all ReportTemplates by Owner
+export async function fetchAllReportTemplatesByOwner(owner: string): Promise<ReportTemplate[] | null> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  return await templatesCollection.find({ owner }).toArray();
+}
+
+// Fetch all ReportTemplates by Atlassian Workspace ID
+export async function fetchAllReportTemplatesByWorkspaceId(atlassianWorkspaceId: string): Promise<ReportTemplate[] | null> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  return await templatesCollection.find({ atlassianWorkspaceId }).toArray();
+}
+
+// Upsert a ReportTemplate
+export async function upsertReportTemplate(template: ReportTemplate): Promise<void> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+  await templatesCollection.updateOne({ id: template.id }, { $set: template }, { upsert: true });
 }

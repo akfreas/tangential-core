@@ -41,6 +41,15 @@ export interface SummaryText {
   color: string;
 }
 
+export interface TextReport {
+  id?: string;
+  basedOnBuildId: string;
+  text: string;
+  generatedOn: string;
+  owner: string;
+  templateId: string;
+}
+
 export interface Report {
   reportType: 'project' | 'epic';
   buildId: string;
@@ -59,6 +68,10 @@ export interface Report {
   priority?: IssuePriority;
   title: string;
   summary?: SummaryText;
+  longRunningDays: number;
+  windowStartDate: string;
+  windowEndDate: string;
+
 }
 export interface IssueReport {
   id: string;
@@ -72,8 +85,6 @@ export interface IssueReport {
 export interface ProjectReport extends Report {
   lead: JiraProfile;
   epics?: EpicReport[];
-  windowStartDate: string;
-  windowEndDate: string;
   projectKey: string;
 }
 
