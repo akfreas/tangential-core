@@ -1,4 +1,9 @@
-import { ChangelogValue, IssueComment, IssuePriority,  JiraProfile } from "./jiraTypes";
+import {
+  ChangelogValue,
+  IssueComment,
+  IssuePriority,
+  JiraProfile,
+} from './jiraTypes';
 
 export interface Velocity {
   daily: number;
@@ -13,7 +18,13 @@ export interface LongRunningIssue {
 }
 
 export type AnalysisState = {
-  id: 'off-track' | 'at-risk' | 'on-track' | 'completed' | 'no-due-date' | 'no-velocity';
+  id:
+    | 'off-track'
+    | 'at-risk'
+    | 'on-track'
+    | 'completed'
+    | 'no-due-date'
+    | 'no-velocity';
   name: string;
   color: string;
 };
@@ -48,6 +59,9 @@ export interface TextReport {
   generatedOn: string;
   owner: string;
   templateId: string;
+  name: string;
+  projectName: string;
+  description: string;
 }
 
 export interface Report {
@@ -71,7 +85,6 @@ export interface Report {
   longRunningDays: number;
   windowStartDate: string;
   windowEndDate: string;
-
 }
 export interface IssueReport {
   id: string;

@@ -5,7 +5,10 @@
     {
       "match": "\\.js$|\\.jsx$|\\.ts$|\\.tsx$", // this regex targets JavaScript and TypeScript files
       "command": "npm run build",
-      "runIn": "backend",
+      "runIn": "backend"
     }
-  ]
+  ],
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

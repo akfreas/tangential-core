@@ -2,6 +2,8 @@ import { doLog, jsonLog } from './logging';
 import { MongoDBWrapper } from './databaseWrapper';
 import { EpicReport, ProjectReport } from './types/reportingTypes';
 
+const collectionId = 'reports';
+
 export async function storeProjectReport(report: ProjectReport): Promise<void> {
   try {
     // Validation for essential keys
@@ -13,7 +15,7 @@ export async function storeProjectReport(report: ProjectReport): Promise<void> {
 
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE)
     
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
     // Storing the report in the database
     await reportsCollection.updateOne(
       { projectKey: report.projectKey, 
@@ -41,7 +43,7 @@ export async function storeEpicReport(report: EpicReport): Promise<void> {
 
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE)
     
-    const reportsCollection = dbWrapper.getCollection<EpicReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<EpicReport>(collectionId);
     // Storing the report in the database
     await reportsCollection.updateOne(
       { key: report.key, ownerId: report.ownerId }, // filter
@@ -58,7 +60,7 @@ export async function storeEpicReport(report: EpicReport): Promise<void> {
 export async function fetchAllProjectReports(ownerId: string): Promise<ProjectReport[] | null> {
   try {
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
     // Fetching all reports from the database
     const reportsArray = await reportsCollection.find({
       ownerId,
@@ -79,7 +81,7 @@ export async function fetchAllProjectReports(ownerId: string): Promise<ProjectRe
 export async function fetchReportByProjectKey(ownerId: string, atlassianWorkspaceId: string, projectKey: string): Promise<ProjectReport | null> {
   try {
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
     // Fetching all reports from the database
     const report: ProjectReport | null = await reportsCollection.findOne({
       ownerId,
@@ -101,7 +103,7 @@ export async function fetchReportByProjectKey(ownerId: string, atlassianWorkspac
 export async function fetchReportByBuildId(ownerId: string, buildId: string): Promise<ProjectReport | null> {
   try {
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
 
     const pipeline = [
       {
@@ -158,7 +160,7 @@ export async function updateReport(report: ProjectReport): Promise<void> {
 
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE)
     
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
     // Storing the report in the database
     await reportsCollection.updateOne(
       { projectKey: report.projectKey, 
@@ -178,7 +180,7 @@ export async function updateReport(report: ProjectReport): Promise<void> {
 export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promise<ProjectReport[] | null> {
   try {
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
 
     const pipeline = [
       {
@@ -219,7 +221,6 @@ export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promi
 
     // Execute the aggregation pipeline
     const latestReportsWithEpics = await reportsCollection.aggregate<ProjectReport>(pipeline).toArray();
-    jsonLog("latestReportsWithEpics", latestReportsWithEpics)
     if (!latestReportsWithEpics || latestReportsWithEpics.length === 0) {
       doLog('No latest project reports with epics found.');
       return [];
@@ -236,7 +237,7 @@ export async function fetchLatestProjectReportsWithEpics(ownerId: string): Promi
 export async function fetchLatestProjectReports(ownerId: string): Promise<ProjectReport[] | null> {
   try {
     const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<ProjectReport>('reports');
+    const reportsCollection = dbWrapper.getCollection<ProjectReport>(collectionId);
 
     // Define the aggregation pipeline
     const pipeline = [

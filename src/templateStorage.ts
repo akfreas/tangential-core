@@ -39,6 +39,20 @@ export async function fetchAllReportTemplatesByOwner(owner: string): Promise<Rep
   return await templatesCollection.find({ owner }).toArray();
 }
 
+// Fetch all ReportTemplates by Owner and Public Templates
+export async function fetchAllReportTemplatesByOwnerAndPublic(owner: string): Promise<ReportTemplate[] | null> {
+  const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
+  const templatesCollection = dbWrapper.getCollection<ReportTemplate>(collectionName);
+
+  // Adding a query to find templates either owned by the specified owner or where isPublic is true
+  return await templatesCollection.find({
+    $or: [
+      { owner },
+      { isPublic: true }
+    ]
+  }).toArray();
+}
+
 // Fetch all ReportTemplates by Atlassian Workspace ID
 export async function fetchAllReportTemplatesByWorkspaceId(atlassianWorkspaceId: string): Promise<ReportTemplate[] | null> {
   const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);

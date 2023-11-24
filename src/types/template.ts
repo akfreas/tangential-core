@@ -5,5 +5,6 @@ export interface ReportTemplate {
   audience: string;
   text: string;
   owner?: string;
-  atlassianWorkspaceId: string;
+  isPublic: boolean;
+  atlassianWorkspaceId?: string;
 }

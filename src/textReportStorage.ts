@@ -1,7 +1,6 @@
 import { doLog } from './logging';
 import { MongoDBWrapper } from './databaseWrapper';
 import { TextReport } from './types/reportingTypes';
-import { UUID } from 'mongodb';
 
 const collectionName = 'text_reports';
 export async function storeTextReport(report: TextReport): Promise<void> {
@@ -12,25 +11,35 @@ export async function storeTextReport(report: TextReport): Promise<void> {
       return;
     }
 
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<TextReport>(collectionName);
-    
+    const dbWrapper = await MongoDBWrapper.getInstance(
+      process.env.MONGODB_URI,
+      process.env.MONGODB_DATABASE,
+    );
+    const reportsCollection =
+      dbWrapper.getCollection<TextReport>(collectionName);
+    const id = `${report.owner}_${report.basedOnBuildId}`;
     await reportsCollection.updateOne(
-      { id: UUID.generate() },
+      { id },
       { $set: report },
-      { upsert: true }
+      { upsert: true },
     );
 
-    doLog(`Successfully stored the TextReport with ID: ${report.id}`);
+    doLog(`Successfully stored the TextReport with ID: ${id}`);
   } catch (error) {
     doLog(`Failed to store the TextReport: ${error}`);
   }
 }
 
-export async function fetchTextReportById(id: string): Promise<TextReport | null> {
+export async function fetchTextReportById(
+  id: string,
+): Promise<TextReport | null> {
   try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<TextReport>(collectionName);
+    const dbWrapper = await MongoDBWrapper.getInstance(
+      process.env.MONGODB_URI,
+      process.env.MONGODB_DATABASE,
+    );
+    const reportsCollection =
+      dbWrapper.getCollection<TextReport>(collectionName);
 
     const report: TextReport | null = await reportsCollection.findOne({ id });
     if (!report) {
@@ -45,35 +54,60 @@ export async function fetchTextReportById(id: string): Promise<TextReport | null
   }
 }
 
-export async function updateTextReport(report: TextReport): Promise<void> {
+export async function updateTextReport(
+  id: string,
+  text: string,
+  name: string,
+  description: string,
+): Promise<void> {
   try {
     // Validation for essential keys
-    if (!report.id) {
+    if (!id) {
       doLog('Error: ID is missing in the provided TextReport');
       return;
     }
 
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<TextReport>(collectionName);
+    const dbWrapper = await MongoDBWrapper.getInstance(
+      process.env.MONGODB_URI,
+      process.env.MONGODB_DATABASE,
+    );
+    const reportsCollection =
+      dbWrapper.getCollection<TextReport>(collectionName);
 
     await reportsCollection.updateOne(
-      { id: report.id },
-      { $set: report },
-      { upsert: true }
+      { id },
+      {
+        $set: {
+          text,
+          name,
+          description,
+        },
+      },
+      { upsert: true },
     );
 
-    doLog(`Successfully updated the TextReport with ID: ${report.id}`);
+    doLog(`Successfully updated the TextReport with ID: ${id}`);
   } catch (error) {
     doLog(`Failed to update the TextReport: ${error}`);
   }
 }
 
-export async function fetchTextReportsByOwner(owner: string): Promise<TextReport[] | null> {
+export async function fetchTextReportsByOwner(
+  owner: string,
+): Promise<TextReport[] | null> {
   try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<TextReport>(collectionName);
+    const dbWrapper = await MongoDBWrapper.getInstance(
+      process.env.MONGODB_URI,
+      process.env.MONGODB_DATABASE,
+    );
+    const reportsCollection =
+      dbWrapper.getCollection<TextReport>(collectionName);
 
-    const reports = await reportsCollection.find({ owner }).toArray();
+    // Add sort parameter to sort by 'generatedOn' in descending order
+    const reports = await reportsCollection
+      .find({ owner })
+      .sort({ generatedOn: 1 })
+      .toArray();
     if (!reports || reports.length === 0) {
       doLog('No TextReports found for the given owner.');
       return [];
@@ -88,8 +122,12 @@ export async function fetchTextReportsByOwner(owner: string): Promise<TextReport
 
 export async function deleteTextReportById(id: string): Promise<void> {
   try {
-    const dbWrapper = await MongoDBWrapper.getInstance(process.env.MONGODB_URI, process.env.MONGODB_DATABASE);
-    const reportsCollection = dbWrapper.getCollection<TextReport>(collectionName);
+    const dbWrapper = await MongoDBWrapper.getInstance(
+      process.env.MONGODB_URI,
+      process.env.MONGODB_DATABASE,
+    );
+    const reportsCollection =
+      dbWrapper.getCollection<TextReport>(collectionName);
 
     const deletionResult = await reportsCollection.deleteOne({ id });
 
