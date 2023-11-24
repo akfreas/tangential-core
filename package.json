@@ -1,6 +1,6 @@
 {
   "name": "@akfreas/tangential-core",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Shared code for Tangential functionality",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
