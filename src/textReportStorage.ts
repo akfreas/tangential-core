@@ -103,10 +103,10 @@ export async function fetchTextReportsByOwner(
     const reportsCollection =
       dbWrapper.getCollection<TextReport>(collectionName);
 
-    // Add sort parameter to sort by 'generatedOn' in descending order
+    // Add sort parameter to sort by 'generatedDate' in descending order
     const reports = await reportsCollection
       .find({ owner })
-      .sort({ generatedOn: 1 })
+      .sort({ generatedDate: 1 })
       .toArray();
     if (!reports || reports.length === 0) {
       doLog('No TextReports found for the given owner.');

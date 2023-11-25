@@ -39,7 +39,7 @@ export interface Analysis {
 export interface ReportBuildStatus {
   status: 'pending' | 'success' | 'failure';
   remainingItems: string[];
-  startedAt: string;
+  startedAt: Date;
   completedAt?: string;
   buildId: string;
 }
@@ -56,7 +56,7 @@ export interface TextReport {
   id?: string;
   basedOnBuildId: string;
   text: string;
-  generatedOn: string;
+  generatedDate: Date;
   owner: string;
   templateId: string;
   name: string;
