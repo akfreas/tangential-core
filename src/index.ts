@@ -7,3 +7,5 @@ export * from './types/jiraTypes';
 export * from './types/generatedReport';
 export * from './types/reportingTypes';
 export * from './textReportStorage';
+export * from './types/projectTypes';
+export * from './projectDefinitionStorage';

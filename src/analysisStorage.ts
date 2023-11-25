@@ -7,8 +7,13 @@ const collectionId = 'reports';
 export async function storeProjectReport(report: ProjectReport): Promise<void> {
   try {
     // Validation for essential keys
-    if (!report.projectKey) {
-      doLog('Error: projectKey is missing in the provided report');
+    if (!report.buildId) {
+      doLog('Error: buildId is missing in the provided report');
+      return;
+    }
+
+    if (!report.id) {
+      doLog('Error: id is missing in the provided report');
       return;
     }
 
@@ -20,17 +25,19 @@ export async function storeProjectReport(report: ProjectReport): Promise<void> {
     const reportsCollection =
       dbWrapper.getCollection<ProjectReport>(collectionId);
     // Storing the report in the database
-    await reportsCollection.updateOne(
+    const result = await reportsCollection.updateOne(
       {
-        projectKey: report.projectKey,
-        ownerId: report.ownerId,
-        atlassianWorkspaceId: report.atlassianWorkspaceId,
-      }, // filter
+        id: report.id,
+      },
       { $set: report }, // update
       { upsert: true }, // options: create a new document if no documents match the filter
     );
 
-    doLog(`Successfully stored the report for project: ${report.projectKey}`);
+    doLog(
+      `Successfully stored the report for project: ${report.buildId} with id ${
+        report.id
+      }. Result: ${JSON.stringify(result)}`,
+    );
   } catch (error) {
     doLog(`Failed to store the report: ${error}`);
   }
@@ -52,7 +59,7 @@ export async function storeEpicReport(report: EpicReport): Promise<void> {
     const reportsCollection = dbWrapper.getCollection<EpicReport>(collectionId);
     // Storing the report in the database
     await reportsCollection.updateOne(
-      { key: report.key, ownerId: report.ownerId }, // filter
+      { id: report.id }, // filter
       { $set: report }, // update
       { upsert: true }, // options: create a new document if no documents match the filter
     );
@@ -109,6 +116,32 @@ export async function fetchReportByProjectKey(
       ownerId,
       projectKey,
       atlassianWorkspaceId,
+    });
+    if (!report) {
+      doLog('No report found.');
+      return null;
+    }
+
+    return report;
+  } catch (error) {
+    doLog(`Failed to fetch report: ${error}`);
+    return null;
+  }
+}
+
+export async function fetchReportById(
+  reportId: string,
+): Promise<ProjectReport | null> {
+  try {
+    const dbWrapper = await MongoDBWrapper.getInstance(
+      process.env.MONGODB_URI,
+      process.env.MONGODB_DATABASE,
+    );
+    const reportsCollection =
+      dbWrapper.getCollection<ProjectReport>(collectionId);
+    // Fetching all reports from the database
+    const report: ProjectReport | null = await reportsCollection.findOne({
+      id: reportId,
     });
     if (!report) {
       doLog('No report found.');
@@ -184,8 +217,8 @@ export async function fetchReportByBuildId(
 export async function updateReport(report: ProjectReport): Promise<void> {
   try {
     // Validation for essential keys
-    if (!report.projectKey) {
-      doLog('Error: projectKey is missing in the provided report');
+    if (!report.buildId) {
+      doLog('Error: buildId is missing in the provided report');
       return;
     }
 
@@ -199,17 +232,16 @@ export async function updateReport(report: ProjectReport): Promise<void> {
     // Storing the report in the database
     await reportsCollection.updateOne(
       {
-        projectKey: report.projectKey,
-        ownerId: report.ownerId,
-        atlassianWorkspaceId: report.atlassianWorkspaceId,
+        id: report.id,
       }, // filter
       { $set: report }, // update
       { upsert: true }, // options: create a new document if no documents match the filter
     );
 
-    doLog(`Successfully updated the report for project: ${report.projectKey}`);
+    doLog(`Successfully updated the report for project: ${report.buildId}`);
   } catch (error) {
     doLog(`Failed to update the report: ${error}`);
+    throw error;
   }
 }
 

@@ -65,6 +65,7 @@ export interface TextReport {
 }
 
 export interface Report {
+  id: string;
   reportType: 'project' | 'epic';
   buildId: string;
   avatar?: string;
@@ -98,7 +99,7 @@ export interface IssueReport {
 export interface ProjectReport extends Report {
   lead: JiraProfile;
   epics?: EpicReport[];
-  projectKey: string;
+  projectDefinitionId: string;
 }
 
 export interface EpicReport extends Report, IssueReport {
