@@ -59,7 +59,7 @@ export async function deleteProjectDefinitionById(id: string): Promise<void> {
 // Fetch all ProjectDefinitions by Owner
 export async function fetchAllProjectDefinitionsByOwner(
   owner: string,
-): Promise<ProjectDefinition[] | null> {
+): Promise<ProjectDefinition[]> {
   const dbWrapper = await MongoDBWrapper.getInstance(
     process.env.MONGODB_URI,
     process.env.MONGODB_DATABASE,
