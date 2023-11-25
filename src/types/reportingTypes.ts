@@ -30,7 +30,7 @@ export type AnalysisState = {
 };
 
 export interface Analysis {
-  predictedEndDate?: string;
+  predictedEndDate?: Date;
   predictedOverdue?: boolean;
   state?: AnalysisState;
   summaryText?: string;
@@ -71,7 +71,7 @@ export interface Report {
   buildStatus: ReportBuildStatus;
   ownerId: string;
   atlassianWorkspaceId: string;
-  reportGenerationDate: string;
+  reportGenerationDate: Date;
   velocity: Velocity;
   analysis?: Analysis;
   remainingPoints: number;
@@ -83,8 +83,8 @@ export interface Report {
   title: string;
   summary?: SummaryText;
   longRunningDays: number;
-  windowStartDate: string;
-  windowEndDate: string;
+  windowStartDate: Date;
+  windowEndDate: Date;
 }
 export interface IssueReport {
   id: string;
@@ -92,7 +92,7 @@ export interface IssueReport {
   changelogTimeline?: ChangelogTimeline;
   commentsTimeline?: IssueCommentsTimeline;
   assignee?: JiraProfile;
-  dueDate?: string;
+  dueDate?: Date;
 }
 
 export interface ProjectReport extends Report {
@@ -110,6 +110,7 @@ export interface EpicReport extends Report, IssueReport {
 
 export interface ChangelogTimeline {
   issueKey: string;
+  pivotDate: Date;
   beforeDate: ChangelogValue[];
   afterDate: ChangelogValue[];
   all: ChangelogValue[];
@@ -122,6 +123,7 @@ export interface ScopeDelta {
 }
 
 export interface IssueCommentsTimeline {
+  pivotDate: Date;
   beforeDate: IssueComment[];
   afterDate: IssueComment[];
 }
