@@ -29,4 +29,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-For more information or to report issues, please visit the repository pages for [Tangential Frontend](https://github.com/akfreas/tangential-frontend) and [Tangential Backend](https://github.com/akfreas/tangential-backend).
+The code in this repo is needed for [Tangential Frontend](https://github.com/akfreas/tangential-frontend) and [Tangential Backend](https://github.com/akfreas/tangential-backend).
